@@ -15,6 +15,17 @@ def get_token() -> str:
     return config["Settings"]["TOKEN"]
 
 
+def add_white_list(username):
+    config.read("Configs/Lists.ini")
+    new_white_list = set(config["Lists"]["white_list"].split(","))
+    new_white_list.add(str(username))
+    print(username)
+    config.set('Lists', 'white_list',
+               str(new_white_list).replace('\'', '').replace('{', '').replace('}', '').replace(' ', ''))
+    with open('Configs/Lists.ini', 'w') as configfile:
+        config.write(configfile)
+
+
 def get_admin_list() -> list:
     config.read("Configs/Lists.ini")
     return config["Lists"]["admin_list"].split(",")

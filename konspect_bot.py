@@ -84,7 +84,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif query.data.count('/') >= 1:
         await send_log(context, message=(
                 "@" + update.effective_user.username + " перешёл в папку " + generators.convert_relative_to_full_path(
-            query.data).replace("\\", " -> ")))
+            query.data).replace("\\", " -> ").replace("/", " -> ")))
 
         reply_markup = InlineKeyboardMarkup(generators.keyboard_generator(query.data))
         await context.bot.send_message(chat_id=query.message.chat.id, text="️📍Выберите необходимое",
@@ -140,6 +140,13 @@ async def qq(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(messages.get_message("not_successfully_sent_to_all_users"))
 
 
+async def add_white(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if not await scripts.check_if_user_in_black_white_list(update, context, update.effective_user.username):
+        return
+    conf.add_white_list(context.args[0])
+    await send_log(context, message=messages.get_log("successfully_added_to_white_list" , context.args[0]))
+
+
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not await scripts.check_if_user_in_black_white_list(update, context, update.effective_user.username):
         return
@@ -156,6 +163,7 @@ def main():
     application.add_handler(CommandHandler("server", server))
     application.add_handler(CommandHandler("info", info))
     application.add_handler(CommandHandler("stop", stop))
+    application.add_handler(CommandHandler("add_white", add_white))
 
     application.add_handler(CallbackQueryHandler(button))
 
